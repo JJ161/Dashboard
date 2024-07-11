@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transpose Existing Table</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+        td {
+            text-align: center;
+        }
+        #transposeButton {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h2>Transpose Existing Table Example</h2>
+    <calcite-button id="transposeButton" slot="primary" width="full" alignment="center" appearance="solid" color="blue" scale="m" type="button">Transpose Table</calcite-button>
+
+    <script>
+        document.getElementById('transposeButton').addEventListener('click', function() {
+            transposeTable();
+        });
+
+        function transposeTable() {
+            // Zugriff auf die bereits existierende Tabelle
+            var table = document.querySelector('table.table-container'); // Passen Sie den Selektor nach Bedarf an
+            var thead = table.querySelector('thead');
+            var tbody = table.querySelector('tbody');
+            var rows = tbody.rows;
+            var rowCount = rows.length;
+            var colCount = rows[0].cells.length;
+
+            var transposedData = [];
+
+            // Initialize the transposedData array
+            for (var i = 0; i < colCount + 1; i++) {
+                transposedData[i] = [];
+            }
+
+            // Populate the transposedData array with header row first
+            var headers = thead.querySelectorAll('th');
+            transposedData[0][0] = '';
+            headers.forEach((header, index) => {
+                transposedData[index + 1][0] = header.innerHTML;
+            });
+
+            // Populate the transposedData array with tbody data
+            for (var r = 0; r < rowCount; r++) {
+                transposedData[0][r + 1] = rows[r].cells[0].innerHTML; // Assuming the first cell in each row is the identifier
+                for (var c = 0; c < colCount; c++) {
+                    transposedData[c + 1][r + 1] = rows[r].cells[c].innerHTML;
+                }
+            }
+
+            // Clear the existing table
+            while (table.firstChild) {
+                table.removeChild(table.firstChild);
+            }
+
+            // Create new header row
+            var newThead = table.createTHead();
+            var headerRow = newThead.insertRow();
+            for (var i = 0; i < transposedData[0].length; i++) {
+                var th = document.createElement("th");
+                th.innerHTML = transposedData[0][i];
+                headerRow.appendChild(th);
+            }
+
+            // Create new rows and cells from the transposed data
+            var newTbody = table.createTBody();
+            for (var i = 1; i < transposedData.length; i++) {
+                var newRow = newTbody.insertRow();
+                for (var j = 0; j < transposedData[i].length; j++) {
+                    var newCell = newRow.insertCell();
+                    newCell.innerHTML = transposedData[i][j];
+                }
+            }
+        }
+    </script>
+</body>
+</html>
